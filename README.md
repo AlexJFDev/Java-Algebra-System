@@ -1,5 +1,7 @@
 # Java Algebra System
 An Open Source Java Library For Performing Algebra
+
+
 ## Planned Algebraic Methods
 - Complete the Square
 - Conversions

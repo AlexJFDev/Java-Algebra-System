@@ -15,6 +15,8 @@ public class AppTest
     @Test
     public void shouldAnswerWithTrue()
     {
-        assertTrue( true );
+        Term testTermOne = new Term("0+0");
+        if(!testTermOne.termAsFormattedString.equals("sum(0,0)")) assertTrue("test one fail", false);
+        assertTrue("all tests passed", true);
     }
 }
