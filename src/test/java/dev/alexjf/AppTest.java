@@ -15,8 +15,8 @@ public class AppTest
     @Test
     public void shouldAnswerWithTrue()
     {
-        Term testTermOne = new Term("0+0");
-        if(!testTermOne.termAsFormattedString.equals("sum(0,0)")) assertTrue("test one fail", false);
+        System.out.println("Test One");
+        if(TestMethods.removeExtraParenthesis("(a+b+c)") != "a+b+c") assertTrue("test one fail", false);
         assertTrue("all tests passed", true);
     }
 }

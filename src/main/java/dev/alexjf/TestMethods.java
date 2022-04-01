@@ -40,7 +40,7 @@ public class TestMethods {
         char innerOperation = ' ';
 
         // for loop to iterate over the entire list
-        for(int currentCharIndex = 0; currentCharIndex < inputStringAsCharacterArrayList.size(); currentCharIndex++){
+        for(int currentCharIndex = 0; currentCharIndex < inputStringAsCharacterArrayList.size() - 1; currentCharIndex++){
             // the current char
             char currentChar = inputStringAsCharacterArrayList.get(currentCharIndex);
             // check if the current character is '(' if it is increase the parenthesis depth then if the parenthesis is not nested set the opening parenthesis index

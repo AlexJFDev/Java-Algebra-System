@@ -54,7 +54,7 @@ public class AlgebraEnvironment implements Serializable{
     }
 
     /**
-     * Add a new item to the expresison hashtable.
+     * Add a new item to the expression hashtable.
      * @param expressionName
      * @param expressionAsString
      * @return Doesn't return anything
