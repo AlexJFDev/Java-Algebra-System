@@ -1,7 +1,5 @@
 package dev.alexjf;
 
-import java.util.Stack;
-
 public class Term {
     Term rightSideTerm;
     Term leftSideTerm;
@@ -9,7 +7,7 @@ public class Term {
     String termAsFormattedString;
 
     public Term(String termAsString){
-        char[] termAsCharArray = termAsString.toCharArray();
+        /*char[] termAsCharArray = termAsString.toCharArray();
         Stack<Character> termAsStack = new Stack<>();
         for(Character currentCharacter: termAsCharArray){
             termAsStack.add(currentCharacter);
@@ -18,7 +16,7 @@ public class Term {
         while(!termAsStack.isEmpty()){
             char currentCharacter = termAsStack.pop();
         }
-        /*
+        
         while(termAsCharArray[0] == '(' && termAsCharArray[termAsCharArray.length - 1] == ')'){
             termAsString = termAsString.substring(1, termAsString.length() - 1);
             termAsCharArray = termAsString.toCharArray();

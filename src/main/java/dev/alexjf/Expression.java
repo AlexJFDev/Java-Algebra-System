@@ -1,6 +1,5 @@
 package dev.alexjf;
 
-import java.util.ArrayList;
 
 public class Expression {
     String expressionAsFormattedString;

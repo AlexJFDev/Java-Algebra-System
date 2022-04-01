@@ -1,6 +1,5 @@
 package dev.alexjf;
 
-import java.lang.Math;
 
 /**
  * This class is meant to hold all the methods for manipulating {@link Expression Expressions} and {@link Equation equations}.

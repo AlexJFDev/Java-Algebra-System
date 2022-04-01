@@ -2,7 +2,6 @@ package dev.alexjf;
 
 import java.util.Hashtable;
 import java.io.Serializable;
-import java.lang.Math;
 /**
  * The Algebra Environment is how the user can do Algebra. <p>
  * It stores all the variables, expressionHashtable, and functions they've defined. <p>
