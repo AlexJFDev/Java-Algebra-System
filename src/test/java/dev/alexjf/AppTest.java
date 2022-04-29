@@ -15,11 +15,7 @@ public class AppTest
      */
     @Test
     public void shouldAnswerWithTrue(){
-        System.out.println(TestMethods.removeExtraParenthesis("(1+2-3*4/5)"));
-        /*System.out.println("Performing True Test One");
-        assertTrue("true test one", TestMethods.shouldRemoveParenthesis('-', '-', '*'));
-        System.out.println("Performing False Test One");
-        assertFalse("false test one", TestMethods.shouldRemoveParenthesis('-', '*', '-'));
-        assertFalse("false test two", TestMethods.shouldRemoveParenthesis(null, '*', '+'));*/
+        System.out.println(TestMethods.removeExtraParenthesis("((a*b)+c*(e+f))"));
+        System.out.println(TestMethods.removeExtraParenthesis("(a+b*(c-d+f)/(g*h)/((i+j-k)/l+m))"));
     }
 }
