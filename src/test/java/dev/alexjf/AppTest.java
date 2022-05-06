@@ -15,7 +15,6 @@ public class AppTest
      */
     @Test
     public void shouldAnswerWithTrue(){
-        //System.out.println(TestMethods.removeExtraParenthesis("(a-(b+c))"));
-        //System.out.println(TestMethods.removeExtraParenthesis("(a+b*(c-d+f)/(g*h)/((i+j-k)/l+m))"));
+        assertTrue("test one", Expression.format("(2'x'-4'x')(3)").equals("(2*'x'-4*'x')*3"));
     }
 }
