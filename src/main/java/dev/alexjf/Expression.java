@@ -57,7 +57,7 @@ public class Expression {
             if(currentChar == '\''){
                 isInVariableReference = !isInVariableReference;
             }
-            if(!(Character.isDigit(currentChar) || currentChar == '\'' || currentChar == '(' || currentChar == ')' || currentChar == '+' || currentChar == '-' || currentChar == '*' || currentChar == '/')){
+            if(!(Character.isDigit(currentChar) || currentChar == '\'' || currentChar == '(' || currentChar == ')' || currentChar == '+' || currentChar == '-' || currentChar == '*' || currentChar == '/') && !isInVariableReference){
                 isInFunctionReference = true;
             }
             // Since a variable could include parenthesis there should be a check to make sure theres no variable before parenthesis are processed
@@ -71,22 +71,26 @@ public class Expression {
                  */
                 if(currentChar == '('){
                     if(!isInFunctionReference){
+                        System.out.println("hit ( without func");
                         char previousChar = inputStringCharacterArrayList.get(currentArrayListIndex - 1);
-                        if(!(previousChar == '+' || previousChar == '-' || previousChar == '*' || previousChar == '/' || previousChar == ' ')){
+                        if(!(previousChar == '+' || previousChar == '-' || previousChar == '*' || previousChar == '/' || previousChar == ' ' || previousChar == '(')){
                             inputStringCharacterArrayList.add(currentArrayListIndex - 1, '*');
+                            System.out.println("adding *");
                         }
                         parenthesisDepth++;
+                        if(parenthesisDepth == 1){
+                            parenthesisSetStartingIndex = currentArrayListIndex;
+                        }
                     } else{
+                        parenthesisDepth++;
                         isInFunctionReference = false;
                     }
-                    if(parenthesisDepth == 1){
-                        parenthesisSetStartingIndex = currentArrayListIndex;
-                    }
                 } else if(currentChar == ')'){
+                    System.out.println("hit )");
                     char nextChar = inputStringCharacterArrayList.get(currentArrayListIndex + 1);
-                        if(!(nextChar == '+' || nextChar == '-' || nextChar == '*' || nextChar == '/' || nextChar == ' ')){
-                            inputStringCharacterArrayList.add(currentArrayListIndex + 1, '*');
-                        }
+                    if(nextChar != '+' && nextChar != '-' && nextChar != '*' && nextChar != '/' && nextChar != ' ' && nextChar != ')'){
+                        inputStringCharacterArrayList.add(currentArrayListIndex + 1, '*');
+                    }
                     parenthesisDepth--;
                     parenthesisDepth = Math.max(0, parenthesisDepth);
                     if(parenthesisDepth == 0 && parenthesisSetStartingIndex != -1){
@@ -102,6 +106,7 @@ public class Expression {
              * -1 is the initial value because it is impossible to be the location of any parenthesis
              */ 
             if(parenthesisSetStartingIndex != -1 && parenthesisSetEndingIndex != -1){
+                System.out.println("hit set");
                 // variable setup
                 int leftSideOperationPriority = 0;
                 int rightSideOperationPriority = 0;
@@ -134,10 +139,12 @@ public class Expression {
                 // check out this stackoverflow link to understand whats happening: https://stackoverflow.com/a/18403396
                 if(insideOperationPriority < leftSideOperationPriority || insideOperationPriority < rightSideOperationPriority){
                     currentArrayListIndex = parenthesisSetStartingIndex;
+                    System.out.println("keeping set");
                 }else{
                     inputStringCharacterArrayList.remove(parenthesisSetEndingIndex);
                     inputStringCharacterArrayList.remove(parenthesisSetStartingIndex);
                     currentArrayListIndex = parenthesisSetStartingIndex - 1;
+                    System.out.println("removing set");
                 }
                 // reset all the for loop variables
                 parenthesisDepth = 0;

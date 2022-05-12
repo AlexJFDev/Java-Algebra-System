@@ -15,6 +15,7 @@ public class AppTest
      */
     @Test
     public void shouldAnswerWithTrue(){
-        assertTrue("test one", Expression.format("(2'x'-4'x')(3)").equals("(2*'x'-4*'x')*3"));
+        System.out.println(Expression.format("('a'-sin('b'+('d'+'e')))('c')"));
+        //assertTrue("test one", Expression.format("(2-sin(4(2-3)))(3)").equals("(2-sin(4*(2-3)))*3"));
     }
 }
