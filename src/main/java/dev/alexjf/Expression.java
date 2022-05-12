@@ -73,7 +73,7 @@ public class Expression {
                     if(!isInFunctionReference){
                         System.out.println("hit ( without func");
                         char previousChar = inputStringCharacterArrayList.get(currentArrayListIndex - 1);
-                        if(!(previousChar == '+' || previousChar == '-' || previousChar == '*' || previousChar == '/' || previousChar == ' ' || previousChar == '(')){
+                        if(previousChar != '+' && previousChar != '-' && previousChar != '*' && previousChar != '/' && previousChar != ' ' && previousChar != '('){
                             inputStringCharacterArrayList.add(currentArrayListIndex - 1, '*');
                             System.out.println("adding *");
                         }
