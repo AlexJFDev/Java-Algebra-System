@@ -70,31 +70,29 @@ public class Expression {
                  * The ) works similarly.
                  */
                 if(currentChar == '('){
-                    if(!isInFunctionReference){
-                        System.out.println("hit ( without func");
-                        char previousChar = inputStringCharacterArrayList.get(currentArrayListIndex - 1);
-                        if(previousChar != '+' && previousChar != '-' && previousChar != '*' && previousChar != '/' && previousChar != ' ' && previousChar != '('){
-                            inputStringCharacterArrayList.add(currentArrayListIndex - 1, '*');
-                            System.out.println("adding *");
-                        }
-                        parenthesisDepth++;
-                        if(parenthesisDepth == 1){
-                            parenthesisSetStartingIndex = currentArrayListIndex;
-                        }
-                    } else{
-                        parenthesisDepth++;
-                        isInFunctionReference = false;
+                    char previousChar = inputStringCharacterArrayList.get(currentArrayListIndex - 1);
+                    if(previousChar == ')' || previousChar == '\''){
+                        System.out.println(previousChar);
+                        inputStringCharacterArrayList.add(currentArrayListIndex, '*');
+                        currentArrayListIndex++;
+                    }
+                    parenthesisDepth++;
+                    if(parenthesisDepth == 1){
+                        parenthesisSetStartingIndex = currentArrayListIndex;
+                        System.out.println("hit set start");
                     }
                 } else if(currentChar == ')'){
-                    System.out.println("hit )");
                     char nextChar = inputStringCharacterArrayList.get(currentArrayListIndex + 1);
-                    if(nextChar != '+' && nextChar != '-' && nextChar != '*' && nextChar != '/' && nextChar != ' ' && nextChar != ')'){
+                    if(nextChar == '(' || nextChar == '\''){
+                        System.out.println(nextChar);
                         inputStringCharacterArrayList.add(currentArrayListIndex + 1, '*');
                     }
                     parenthesisDepth--;
                     parenthesisDepth = Math.max(0, parenthesisDepth);
+                    System.out.println(parenthesisDepth);
                     if(parenthesisDepth == 0 && parenthesisSetStartingIndex != -1){
                         parenthesisSetEndingIndex = currentArrayListIndex;
+                        System.out.println("hit set end");
                     }
                 }
                 if(parenthesisDepth != 0 && (currentChar == '+' || currentChar == '-' || currentChar == '*' || currentChar == '/') && (insideOperation != '+' && insideOperation != '-')){
@@ -106,7 +104,7 @@ public class Expression {
              * -1 is the initial value because it is impossible to be the location of any parenthesis
              */ 
             if(parenthesisSetStartingIndex != -1 && parenthesisSetEndingIndex != -1){
-                System.out.println("hit set");
+                System.out.println("hit a set");
                 // variable setup
                 int leftSideOperationPriority = 0;
                 int rightSideOperationPriority = 0;
@@ -114,7 +112,8 @@ public class Expression {
                 leftSideOperation = inputStringCharacterArrayList.get(parenthesisSetStartingIndex - 1);
                 rightSideOperation = inputStringCharacterArrayList.get(parenthesisSetEndingIndex + 1);
                 // set the priority for the operation on the left side of the parenthesis set
-                if(leftSideOperation == '+'){
+                if(leftSideOperation == '('){
+                } else if(leftSideOperation == '+'){
                     leftSideOperationPriority = 1;
                 } else if (leftSideOperation == '-'){
                     leftSideOperationPriority = 2;
@@ -122,13 +121,18 @@ public class Expression {
                     leftSideOperationPriority = 3;
                 } else if (leftSideOperation == '/'){
                     leftSideOperationPriority = 4;
+                } else {
+                    leftSideOperationPriority = 5;
                 }
                 // set the priority for the operation on the left side of the parenthesis set
                 // This one is different from the left side one because of the way - and / work with PEMDAS
-                if(rightSideOperation == '+' || rightSideOperation == '-'){
+                if(rightSideOperation == ')'){
+                } else if(rightSideOperation == '+' || rightSideOperation == '-'){
                     rightSideOperationPriority = 1;
                 } else if (rightSideOperation == '*' || rightSideOperation == '/'){
                     rightSideOperationPriority = 3;
+                } else {
+                    leftSideOperationPriority = 5;
                 }
                 // set the priority for the operation on the inside of the parenthesis set
                 if(insideOperation == '+' || insideOperation == '-'){
@@ -139,12 +143,10 @@ public class Expression {
                 // check out this stackoverflow link to understand whats happening: https://stackoverflow.com/a/18403396
                 if(insideOperationPriority < leftSideOperationPriority || insideOperationPriority < rightSideOperationPriority){
                     currentArrayListIndex = parenthesisSetStartingIndex;
-                    System.out.println("keeping set");
                 }else{
                     inputStringCharacterArrayList.remove(parenthesisSetEndingIndex);
                     inputStringCharacterArrayList.remove(parenthesisSetStartingIndex);
                     currentArrayListIndex = parenthesisSetStartingIndex - 1;
-                    System.out.println("removing set");
                 }
                 // reset all the for loop variables
                 parenthesisDepth = 0;
