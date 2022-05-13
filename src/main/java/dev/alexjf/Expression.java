@@ -104,6 +104,23 @@ public class Expression {
              * -1 is the initial value because it is impossible to be the location of any parenthesis
              */ 
             if(parenthesisSetStartingIndex != -1 && parenthesisSetEndingIndex != -1){
+                ArrayList<Character> subExpressionArrayList = new ArrayList<>(inputStringCharacterArrayList.subList(parenthesisSetStartingIndex + 1, parenthesisSetEndingIndex));
+                StringBuilder outputStringBuilder = new StringBuilder(subExpressionArrayList.size());
+                for(Character currentCharacter: subExpressionArrayList)
+                {
+                    outputStringBuilder.append(currentCharacter);
+                }
+                String subExpressionString = outputStringBuilder.toString();
+                String formattedSubExpressionString = format(subExpressionString);
+                System.out.println(formattedSubExpressionString);
+                char[] formattedSubExpressionStringCharArray = formattedSubExpressionString.toCharArray();
+                ArrayList<Character> formattedSubExpressionStringCharArrayList = new ArrayList<>();
+                // the extra space at the start and end help with logic later on
+                for(char currentSubChar: formattedSubExpressionStringCharArray){
+                    if(currentChar != ' '){
+                        formattedSubExpressionStringCharArrayList.add(currentSubChar);
+                    }
+                }
                 // variable setup
                 int leftSideOperationPriority = 0;
                 int rightSideOperationPriority = 0;
@@ -139,14 +156,16 @@ public class Expression {
                 } else if (insideOperation == '*' || insideOperation == '/'){
                     insideOperationPriority = 3;
                 }
-                // check out this stackoverflow link to understand whats happening: https://stackoverflow.com/a/18403396
+                // check out this stackoverflow link to understand whats happening with logic: https://stackoverflow.com/a/18403396
                 if(insideOperationPriority < leftSideOperationPriority || insideOperationPriority < rightSideOperationPriority){
-                    currentArrayListIndex = parenthesisSetStartingIndex;
+                    currentArrayListIndex = parenthesisSetStartingIndex + formattedSubExpressionStringCharArrayList.size() + 1;
+                    removeRangeFromArrayList(inputStringCharacterArrayList, parenthesisSetStartingIndex + 1, parenthesisSetEndingIndex);
+                    insertArrayListIntoArrayList(inputStringCharacterArrayList, formattedSubExpressionStringCharArrayList, parenthesisSetStartingIndex + 1);
                 }else{
-                    inputStringCharacterArrayList.remove(parenthesisSetEndingIndex);
-                    inputStringCharacterArrayList.remove(parenthesisSetStartingIndex);
-                    currentArrayListIndex = parenthesisSetStartingIndex - 1;
-                }
+                    currentArrayListIndex = parenthesisSetStartingIndex + formattedSubExpressionStringCharArrayList.size() - 1;
+                    removeRangeFromArrayList(inputStringCharacterArrayList, parenthesisSetStartingIndex, parenthesisSetEndingIndex + 1);
+                    insertArrayListIntoArrayList(inputStringCharacterArrayList, formattedSubExpressionStringCharArrayList, parenthesisSetStartingIndex);
+                }/**/
                 // reset all the for loop variables
                 parenthesisDepth = 0;
                 parenthesisSetStartingIndex = -1;
@@ -173,8 +192,30 @@ public class Expression {
     public static String expand(String inputString){
         return "";
     }
-    
+
     public static String factor(String inputString){
         return "";
+    }
+
+
+    /**
+     * Remove all elements from the inputArrayList from the startingIndex (inclusive) to the
+     * endingIndex (exclusive).
+     * 
+     * @param inputArrayList The ArrayList that you want to remove elements from.
+     * @param startingIndex The index of the first element to be removed.
+     * @param endingIndex The index of the last element to be removed.
+     * @return An ArrayList of Objects
+     */
+    public static void removeRangeFromArrayList(ArrayList<?> inputArrayList, int startingIndex, int endingIndex){
+        for(int i = 0; i < endingIndex - startingIndex; i++){
+            inputArrayList.remove(startingIndex);
+        }
+    }
+    
+    public static <E> void insertArrayListIntoArrayList(ArrayList<E> mainArrayList, ArrayList<E> subArrayList, int insertPosition){
+        for(int currentSubArrayListIndex = subArrayList.size(); currentSubArrayListIndex > 0; currentSubArrayListIndex--){
+            mainArrayList.add(insertPosition, subArrayList.get(currentSubArrayListIndex - 1));
+        }
     }
 }
