@@ -104,30 +104,11 @@ public class Expression {
              * -1 is the initial value because it is impossible to be the location of any parenthesis
              */ 
             if(parenthesisSetStartingIndex != -1 && parenthesisSetEndingIndex != -1){
-                // variable setup
-                int leftSideOperationPriority = 0;
-                int rightSideOperationPriority = 0;
-                int insideOperationPriority = 5;
-                leftSideOperation = inputStringCharacterArrayList.get(parenthesisSetStartingIndex - 1);
-                rightSideOperation = inputStringCharacterArrayList.get(parenthesisSetEndingIndex + 1);
-                // set the priority for the operation on the left side of the parenthesis set
-                if(leftSideOperation == '(' || leftSideOperation == ','){
-                } else if(leftSideOperation == '+'){
-                    leftSideOperationPriority = 1;
-                } else if (leftSideOperation == '-'){
-                    leftSideOperationPriority = 2;
-                } else if (leftSideOperation == '*'){
-                    leftSideOperationPriority = 3;
-                } else if (leftSideOperation == '/'){
-                    leftSideOperationPriority = 4;
-                } else {
-                    leftSideOperationPriority = 5;
-                }
+                System.out.println("hit set");
                 // Apply this format method to the inside of the parenthesis
                 ArrayList<Character> subExpressionArrayList = new ArrayList<>(inputStringCharacterArrayList.subList(parenthesisSetStartingIndex + 1, parenthesisSetEndingIndex));
                 StringBuilder outputStringBuilder = new StringBuilder(subExpressionArrayList.size());
-                for(Character currentCharacter: subExpressionArrayList)
-                {
+                for(Character currentCharacter: subExpressionArrayList){
                     outputStringBuilder.append(currentCharacter);
                 }
                 String subExpressionString = outputStringBuilder.toString();
@@ -139,15 +120,34 @@ public class Expression {
                         formattedSubExpressionStringCharArrayList.add(currentSubChar);
                     }
                 }
+                // variable setup
+                int leftSideOperationPriority = 0;
+                int rightSideOperationPriority = 0;
+                int insideOperationPriority = 5;
+                leftSideOperation = inputStringCharacterArrayList.get(parenthesisSetStartingIndex - 1);
+                rightSideOperation = inputStringCharacterArrayList.get(parenthesisSetEndingIndex + 1);
+                // set the priority for the operation on the left side of the parenthesis set
+                if(leftSideOperation == '(' || leftSideOperation == ',' || leftSideOperation == ' '){
+                } else if(leftSideOperation == '+'){
+                    leftSideOperationPriority = 1;
+                } else if (leftSideOperation == '-'){
+                    leftSideOperationPriority = 2;
+                } else if (leftSideOperation == '*'){
+                    leftSideOperationPriority = 3;
+                } else if (leftSideOperation == '/'){
+                    leftSideOperationPriority = 4;
+                } else {
+                    leftSideOperationPriority = 5;
+                }
                 // set the priority for the operation on the left side of the parenthesis set
                 // This one is different from the left side one because of the way - and / work with PEMDAS
-                if(rightSideOperation == ')' || rightSideOperation == ','){
+                if(rightSideOperation == ')' || rightSideOperation == ',' || rightSideOperation == ' '){
                 } else if(rightSideOperation == '+' || rightSideOperation == '-'){
                     rightSideOperationPriority = 1;
                 } else if (rightSideOperation == '*' || rightSideOperation == '/'){
                     rightSideOperationPriority = 3;
                 } else {
-                    leftSideOperationPriority = 5;
+                    rightSideOperationPriority = 5;
                 }
                 // set the priority for the operation on the inside of the parenthesis set
                 if(insideOperation == '+' || insideOperation == '-'){
@@ -155,13 +155,18 @@ public class Expression {
                 } else if (insideOperation == '*' || insideOperation == '/'){
                     insideOperationPriority = 3;
                 }
+                System.out.println(insideOperationPriority);
+                System.out.println(leftSideOperationPriority);
+                System.out.println(rightSideOperationPriority);
                 // check out this stackoverflow link to better understand whats happening with logic: https://stackoverflow.com/a/18403396
                 if(insideOperationPriority < leftSideOperationPriority || insideOperationPriority < rightSideOperationPriority){
                     // If true then the parenthesis should be kept
+                    System.out.println("keeping set");
                     currentArrayListIndex = parenthesisSetStartingIndex + formattedSubExpressionStringCharArrayList.size() + 1;
                     removeRangeFromArrayList(inputStringCharacterArrayList, parenthesisSetStartingIndex + 1, parenthesisSetEndingIndex);
                     insertArrayListIntoArrayList(inputStringCharacterArrayList, formattedSubExpressionStringCharArrayList, parenthesisSetStartingIndex + 1);
                 }else{
+                    System.out.println("removing set");
                     currentArrayListIndex = parenthesisSetStartingIndex + formattedSubExpressionStringCharArrayList.size() - 1;
                     removeRangeFromArrayList(inputStringCharacterArrayList, parenthesisSetStartingIndex, parenthesisSetEndingIndex + 1);
                     insertArrayListIntoArrayList(inputStringCharacterArrayList, formattedSubExpressionStringCharArrayList, parenthesisSetStartingIndex);
@@ -179,7 +184,7 @@ public class Expression {
             }
         }
         for(int currentArrayListIndex = 1; currentArrayListIndex < inputStringCharacterArrayList.size() - 1; currentArrayListIndex++){
-            
+
         }
         // Build the characterArrayList back into a string and then return the string
         StringBuilder outputStringBuilder = new StringBuilder(inputStringCharacterArrayList.size());

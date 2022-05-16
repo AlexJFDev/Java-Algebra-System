@@ -18,6 +18,7 @@ public class AppTest
         //System.out.println(Expression.format("('a'-sin('b'*('d'*'e')))*('c')"));
         //System.out.println(Expression.format("sin('b'*('d'*'e'))"));
         //assertTrue("test one", Expression.format("(2-sin(4(2-3)))(3)").equals("(2-sin(4*(2-3)))*3"));
-        System.out.println(Expression.format("((2'a'+7'a')*8'a'+4'a'-3'b'+tan('a''b')+'a''b')"));
+        System.out.println(Expression.format("((2'a'+7'b')*8'c'+4'd'-3'e'+tan('f''g')+'h''i')"));
+        System.out.println(Expression.format("tan('a'+'b')"));
     }
 }
