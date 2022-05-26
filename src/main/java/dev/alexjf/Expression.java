@@ -4,9 +4,10 @@ import java.util.ArrayList;
 
 public class Expression {
     String expressionRaw;
-    String expressionFormatted;
-    String expressionExpanded;
-    String expressionFactored;
+    ArrayList<Character> expressionFormattedArrayList;
+    ArrayList<Character> expressionExpandedArrayList;
+    ArrayList<Character> expressionFactoredArrayList;
+    String expressionFormattedString;
 
     /**
      * This constructor takes the string that is meant to represent the expression. It first formats the expression to be compatible with other methods.
@@ -15,9 +16,23 @@ public class Expression {
      */
     public Expression(String expressionAsString){
         expressionRaw = expressionAsString;
-        expressionFormatted = format(expressionAsString);
-        expressionFactored = factor(expressionFormatted);
-        expressionExpanded = expand(expressionFormatted);
+        char[] expressionAsCharArray = expressionRaw.toCharArray();
+        ArrayList<Character> expressionAsCharacterArrayList = new ArrayList<>();
+        for(char currentChar: expressionAsCharArray){
+            if(currentChar != ' '){
+                expressionAsCharacterArrayList.add(currentChar);
+            }
+        }
+        expressionFormattedArrayList = format(expressionAsCharacterArrayList);
+        expressionFormattedArrayList.remove(0);
+        expressionFormattedArrayList.remove(expressionFormattedArrayList.size() - 1);
+        StringBuilder expressionStringBuilder = new StringBuilder();
+        for(char currentChar: expressionFormattedArrayList){
+            expressionStringBuilder.append(currentChar);
+        }
+        expressionFormattedString = expressionStringBuilder.toString();
+        expressionFactoredArrayList = factor(expressionFormattedArrayList);
+        expressionExpandedArrayList = expand(expressionFormattedArrayList);
     }
 
     /** 
@@ -26,26 +41,22 @@ public class Expression {
      * @param inputString The mathematical expression represented as a string
      * @return String
      */
-    public static String format(String inputString){
-        // setup for the array that will be worked with
-        char[] inputStringCharArray = inputString.toCharArray();
-        ArrayList<Character> inputStringCharacterArrayList = new ArrayList<>();
-        // the extra space at the start and end help with logic later on
-        inputStringCharacterArrayList.add(' ');
-        for(char currentChar: inputStringCharArray){
-            if(currentChar != ' '){
-                inputStringCharacterArrayList.add(currentChar);
-            }
-        }
-        inputStringCharacterArrayList.add(' ');
+    public static ArrayList<Character> format(ArrayList<Character> inputStringCharacterArrayList){
+        ArrayList<Character> formattedInputStringCharacterArrayList = new ArrayList<>(inputStringCharacterArrayList);
+        formattedInputStringCharacterArrayList.add(' ');
+        formattedInputStringCharacterArrayList.add(0, ' ');
+
         // All these variables are needed in the for loop
         int parenthesisDepth = 0;
         int parenthesisSetStartingIndex = -1;
         int parenthesisSetEndingIndex = -1;
+        int termStartingIndex = 1;
+        int termEndingIndex = -1;
         char leftSideOperation = ' ';
         char rightSideOperation = ' ';
         char insideOperation = ' ';
         boolean isInVariableReference = false;
+        //ArrayList<ArrayList<Character>> expressionTermsArrayList = new ArrayList<>();
         // since the first character and last characters in the arrayList are the spaces that were added earlier they can be skipped over
         for(int currentArrayListIndex = 1; currentArrayListIndex < inputStringCharacterArrayList.size() - 1; currentArrayListIndex++){
             /* the currentChar is the character at the currentArrayListIndex. 
@@ -54,15 +65,14 @@ public class Expression {
             Keep in mind that the constants PI and E are treated like functions*/
             char currentChar = inputStringCharacterArrayList.get(currentArrayListIndex);
             if(currentChar == '\''){
+                System.out.println("ahh");
                 isInVariableReference = !isInVariableReference;
-                char previousChar = inputStringCharacterArrayList.get(currentArrayListIndex - 1);
-                if(Character.isDigit(previousChar)){
-                    inputStringCharacterArrayList.add(currentArrayListIndex, '*');
-                    currentArrayListIndex++;
-                }
-                char nextChar = inputStringCharacterArrayList.get(currentArrayListIndex + 1);
-                if(nextChar == '\'' || Character.isDigit(nextChar)){
-                    inputStringCharacterArrayList.add(currentArrayListIndex + 1, '*');
+                if(!isInVariableReference){
+                    char nextChar = inputStringCharacterArrayList.get(currentArrayListIndex + 1);
+                    if(nextChar != '+' && nextChar != '-' && nextChar != '*' && nextChar != '/' && nextChar != ')'){
+                        inputStringCharacterArrayList.add(currentArrayListIndex + 1, '*');
+                        System.out.println("bb");
+                    }
                 }
             }
             // Since a variable could include parenthesis there should be a check to make sure theres no variable before parenthesis are processed
@@ -75,24 +85,25 @@ public class Expression {
                  * The ) works similarly.
                  */
                 if(currentChar == '('){
-                    char previousChar = inputStringCharacterArrayList.get(currentArrayListIndex - 1);
-                    if(previousChar == ')' || previousChar == '\''){
-                        inputStringCharacterArrayList.add(currentArrayListIndex, '*');
-                        currentArrayListIndex++;
-                    }
                     parenthesisDepth++;
                     if(parenthesisDepth == 1){
                         parenthesisSetStartingIndex = currentArrayListIndex;
                     }
                 } else if(currentChar == ')'){
                     char nextChar = inputStringCharacterArrayList.get(currentArrayListIndex + 1);
-                    if(nextChar == '(' || nextChar == '\''){
+                    if(!(nextChar == '+' || nextChar == '-' || nextChar == '*' || nextChar == '/' || nextChar == ')')){
                         inputStringCharacterArrayList.add(currentArrayListIndex + 1, '*');
                     }
                     parenthesisDepth--;
                     parenthesisDepth = Math.max(0, parenthesisDepth);
                     if(parenthesisDepth == 0 && parenthesisSetStartingIndex != -1){
                         parenthesisSetEndingIndex = currentArrayListIndex;
+                    }
+                } else if(currentChar == '*' || currentChar == '/'){
+                    if(termStartingIndex == -1){
+                        termStartingIndex = currentArrayListIndex;
+                    } else {
+                        termEndingIndex = currentArrayListIndex;
                     }
                 }
                 if(parenthesisDepth != 0 && (currentChar == '+' || currentChar == '-' || currentChar == '*' || currentChar == '/') && (insideOperation != '+' && insideOperation != '-')){
@@ -103,31 +114,30 @@ public class Expression {
              * The index variables for the parenthesis are checked to see if they are not their initial value of -1
              * -1 is the initial value because it is impossible to be the location of any parenthesis
              */ 
+            if(termStartingIndex != -1 && termEndingIndex != -1){
+                ArrayList<Character> termArrayList = new ArrayList<>(inputStringCharacterArrayList.subList(termStartingIndex + 1, termEndingIndex));
+                //expressionTermsArrayList.add(termArrayList);
+                for(char currentTermChar: termArrayList){
+                    System.out.print(currentTermChar);
+                }
+                System.out.println();
+                termStartingIndex = -1;
+                termEndingIndex = -1;
+            }
             if(parenthesisSetStartingIndex != -1 && parenthesisSetEndingIndex != -1){
                 System.out.println("hit set");
                 // Apply this format method to the inside of the parenthesis
                 ArrayList<Character> subExpressionArrayList = new ArrayList<>(inputStringCharacterArrayList.subList(parenthesisSetStartingIndex + 1, parenthesisSetEndingIndex));
-                StringBuilder outputStringBuilder = new StringBuilder(subExpressionArrayList.size());
-                for(Character currentCharacter: subExpressionArrayList){
-                    outputStringBuilder.append(currentCharacter);
-                }
-                String subExpressionString = outputStringBuilder.toString();
-                String formattedSubExpressionString = format(subExpressionString);
-                char[] formattedSubExpressionStringCharArray = formattedSubExpressionString.toCharArray();
-                ArrayList<Character> formattedSubExpressionStringCharArrayList = new ArrayList<>();
-                for(char currentSubChar: formattedSubExpressionStringCharArray){
-                    if(currentChar != ' '){
-                        formattedSubExpressionStringCharArrayList.add(currentSubChar);
-                    }
-                }
+                ArrayList<Character> formattedSubExpressionArrayList = format(subExpressionArrayList);
                 // variable setup
-                int leftSideOperationPriority = 0;
-                int rightSideOperationPriority = 0;
+                int leftSideOperationPriority = 6;
+                int rightSideOperationPriority = 6;
                 int insideOperationPriority = 5;
                 leftSideOperation = inputStringCharacterArrayList.get(parenthesisSetStartingIndex - 1);
                 rightSideOperation = inputStringCharacterArrayList.get(parenthesisSetEndingIndex + 1);
                 // set the priority for the operation on the left side of the parenthesis set
                 if(leftSideOperation == '(' || leftSideOperation == ',' || leftSideOperation == ' '){
+                    leftSideOperationPriority = 0;
                 } else if(leftSideOperation == '+'){
                     leftSideOperationPriority = 1;
                 } else if (leftSideOperation == '-'){
@@ -136,18 +146,15 @@ public class Expression {
                     leftSideOperationPriority = 3;
                 } else if (leftSideOperation == '/'){
                     leftSideOperationPriority = 4;
-                } else {
-                    leftSideOperationPriority = 5;
                 }
                 // set the priority for the operation on the left side of the parenthesis set
                 // This one is different from the left side one because of the way - and / work with PEMDAS
                 if(rightSideOperation == ')' || rightSideOperation == ',' || rightSideOperation == ' '){
+                    rightSideOperationPriority = 0;
                 } else if(rightSideOperation == '+' || rightSideOperation == '-'){
                     rightSideOperationPriority = 1;
                 } else if (rightSideOperation == '*' || rightSideOperation == '/'){
                     rightSideOperationPriority = 3;
-                } else {
-                    rightSideOperationPriority = 5;
                 }
                 // set the priority for the operation on the inside of the parenthesis set
                 if(insideOperation == '+' || insideOperation == '-'){
@@ -162,14 +169,14 @@ public class Expression {
                 if(insideOperationPriority < leftSideOperationPriority || insideOperationPriority < rightSideOperationPriority){
                     // If true then the parenthesis should be kept
                     System.out.println("keeping set");
-                    currentArrayListIndex = parenthesisSetStartingIndex + formattedSubExpressionStringCharArrayList.size() + 1;
+                    currentArrayListIndex = parenthesisSetStartingIndex + formattedSubExpressionArrayList.size() + 1;
                     removeRangeFromArrayList(inputStringCharacterArrayList, parenthesisSetStartingIndex + 1, parenthesisSetEndingIndex);
-                    insertArrayListIntoArrayList(inputStringCharacterArrayList, formattedSubExpressionStringCharArrayList, parenthesisSetStartingIndex + 1);
+                    insertArrayListIntoArrayList(inputStringCharacterArrayList, formattedSubExpressionArrayList, parenthesisSetStartingIndex + 1);
                 }else{
                     System.out.println("removing set");
-                    currentArrayListIndex = parenthesisSetStartingIndex + formattedSubExpressionStringCharArrayList.size() - 1;
+                    currentArrayListIndex = parenthesisSetStartingIndex + formattedSubExpressionArrayList.size() - 1;
                     removeRangeFromArrayList(inputStringCharacterArrayList, parenthesisSetStartingIndex, parenthesisSetEndingIndex + 1);
-                    insertArrayListIntoArrayList(inputStringCharacterArrayList, formattedSubExpressionStringCharArrayList, parenthesisSetStartingIndex);
+                    insertArrayListIntoArrayList(inputStringCharacterArrayList, formattedSubExpressionArrayList, parenthesisSetStartingIndex);
                 }
                 // reset all the for loop variables
                 parenthesisDepth = 0;
@@ -183,28 +190,17 @@ public class Expression {
                 insideOperationPriority = 0;
             }
         }
-        for(int currentArrayListIndex = 1; currentArrayListIndex < inputStringCharacterArrayList.size() - 1; currentArrayListIndex++){
-
-        }
-        // Build the characterArrayList back into a string and then return the string
-        StringBuilder outputStringBuilder = new StringBuilder(inputStringCharacterArrayList.size());
-        inputStringCharacterArrayList.remove(0);
-        inputStringCharacterArrayList.remove(inputStringCharacterArrayList.size() - 1);
-        for(Character currentCharacter: inputStringCharacterArrayList)
-        {
-            outputStringBuilder.append(currentCharacter);
-        }
-        return outputStringBuilder.toString();
+        return formattedInputStringCharacterArrayList;
     }
 
-    public static String expand(String inputString){
-        return "";
+    
+    public static ArrayList<Character> expand(ArrayList<Character> inputStringCharacterArrayList){
+        return new ArrayList<>();
     }
 
-    public static String factor(String inputString){
-        return "";
+    public static ArrayList<Character> factor(ArrayList<Character> inputStringCharacterArrayList){
+        return new ArrayList<>();
     }
-
 
     /**
      * Remove all elements from the inputArrayList from the startingIndex (inclusive) to the
